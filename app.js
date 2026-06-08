@@ -257,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         sec.items.forEach(item => {
                             if (typeof item === 'string') {
                                 const isImage = item.match(/\.(png|jpg|jpeg|gif|webp|svg)$/i);
+                                const isVideo = item.match(/\.(mp4|webm|mov|ogg)$/i);
                                 const isHeading3 = item.startsWith('**') && item.endsWith('**');
                                 const isHeading4 = item.startsWith('###');
                                 const isListItem = item.startsWith('- ') || item.startsWith('・');
@@ -268,6 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 if (isImage) {
                                     html += `<div class="detail-image-inline"><img src="${item}" alt="image" loading="lazy" /></div>`;
+                                } else if (isVideo) {
+                                    html += `<div class="detail-image-inline"><video src="${item}" controls style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);" preload="metadata"></video></div>`;
                                 } else if (isHeading3) {
                                     html += `<h3>${item.slice(2, -2)}</h3>`;
                                 } else if (isHeading4) {
