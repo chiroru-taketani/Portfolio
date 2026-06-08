@@ -78,15 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const c = project.content;
 
             const defTitles = typeof sectionTitles !== 'undefined' ? sectionTitles : {
-                overview: 'プロジェクトの概要 (Overview)',
-                background: '開発の背景と目的',
-                techStack: '使用技術・開発環境',
-                architecture: 'システム構成',
-                challenges: '技術的な課題と解決策',
-                achievements: '実績・対外的な評価',
-                role: '担当箇所と開発体制',
-                links: '成果物へのリンク',
-                gallery: 'ギャラリー'
             };
 
             let sections = [];
@@ -128,19 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const defaultJpTitles = {
-                    overview: 'プロジェクトの概要',
-                    background: '開発の背景と目的',
-                    techStack: '使用技術・開発環境',
-                    architecture: 'システム構成',
-                    challenges: '技術的な課題と解決策',
-                    achievements: '実績・対外的な評価',
-                    role: '担当箇所と開発体制',
-                    links: '成果物へのリンク',
-                    gallery: 'ギャラリー'
-                };
-
-                let title = sec.title || defTitles[sec.type] || defaultJpTitles[sec.type] || sec.type;
+                // Get title from data.js sectionTitles, or sec.title, or fallback to the key itself
+                const globalTitles = typeof sectionTitles !== 'undefined' ? sectionTitles : {};
+                let title = sec.title || globalTitles[sec.type] || sec.type;
                 let renderedSomething = false;
 
                 if (sec.type === 'overview') {
@@ -152,39 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${desc ? `<p>${desc}</p>` : ''}
                     </section>`;
                     renderedSomething = true;
-                } else if (sec.type === 'techStack') {
-                    const items = sec.items || [];
-                    if (items.length > 0) {
-                        html += `<section class="work-section">
-                            <h2>${title}</h2>
-                            <ul>
-                                ${items.map(tech => `<li><strong>${tech.category || ''}:</strong> ${tech.details || tech.text || tech}</li>`).join('')}
-                            </ul>
-                        </section>`;
-                        renderedSomething = true;
-                    }
-                } else if (sec.type === 'architecture') {
-                    const desc = sec.description || sec.text || '';
-                    html += `<section class="work-section">
-                        <h2>${title}</h2>
-                        ${desc ? `<p>${desc}</p>` : ''}
-                        ${sec.image ? `<div class="arch-image"><img src="${sec.image}" alt="Architecture" loading="lazy" /></div>` : ''}
-                    </section>`;
-                    renderedSomething = true;
-                } else if (sec.type === 'challenges') {
-                    const items = sec.items || [];
-                    if (items.length > 0) {
-                        html += `<section class="work-section">
-                            <h2>${title}</h2>
-                            ${items.map(ch => `
-                                <div class="challenge-item">
-                                    <h4>課題: ${ch.task}</h4>
-                                    <p>解決策: ${ch.solution}</p>
-                                </div>
-                            `).join('')}
-                        </section>`;
-                        renderedSomething = true;
-                    }
+
+
                 } else if (sec.type === 'links') {
                     const items = sec.items || [];
                     if (items.length > 0) {
@@ -286,18 +236,35 @@ document.addEventListener('DOMContentLoaded', () => {
                                     html += `<p>${item}</p>`;
                                 }
                             } else {
-                                if (inList) {
+                                const isCategoryItem = item.category && item.details;
+                                const isUrlItem = item.label && item.url;
+                                
+                                if (!(isCategoryItem || isUrlItem) && inList) {
                                     html += `</ul>`;
                                     inList = false;
                                 }
-                                if (item.category && item.details) {
-                                    html += `<ul><li><strong>${item.category}:</strong> ${item.details}</li></ul>`;
-                                } else if (item.label && item.url) {
-                                    html += `<ul><li><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.label}</a></li></ul>`;
+                                
+                                if (isCategoryItem || isUrlItem) {
+                                    if (!inList) {
+                                        html += `<ul>`;
+                                        inList = true;
+                                    }
+                                    if (isCategoryItem) {
+                                        html += `<li><strong>${item.category}:</strong> ${item.details}</li>`;
+                                    } else {
+                                        html += `<li><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.label}</a></li>`;
+                                    }
                                 } else if (item.subtitle) {
                                     html += `<h3>${item.subtitle}</h3>`;
                                 } else if (item.image) {
-                                    html += `<div class="detail-image-inline"><img src="${item.image}" alt="image" loading="lazy" /></div>`;
+                                    const customStyle = item.width ? `width: ${item.width}; margin: 3.5rem auto;` : '';
+                                    html += `<div class="detail-image-inline" style="${customStyle}"><img src="${item.image}" alt="image" loading="lazy" /></div>`;
+                                } else if (item.images && Array.isArray(item.images)) {
+                                    html += `<div class="detail-images-row" style="display: grid; grid-template-columns: repeat(${item.images.length}, 1fr); gap: 1rem; margin: 3.5rem 0;">`;
+                                    item.images.forEach(img => {
+                                        html += `<img src="${img}" alt="image" loading="lazy" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 30px rgba(0,0,0,0.1);" />`;
+                                    });
+                                    html += `</div>`;
                                 } else if (item.text) {
                                     html += `<p>${item.text}</p>`;
                                 }
