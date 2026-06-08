@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUPON MOTION DESIGN - Portfolio</title>
+    <meta name="description" content="Portfolio site based on GUPON motion design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <header class="header">
+                <div class="sitename">
+                    <a href="index.html">GUPON MOTION DESIGN</a>
+                </div>
+                <nav>
+                    <ul class="nav">
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="index.html" class="active">Works</a></li>
+                    </ul>
+                </nav>
+            </header>
+            
+            <main>
+                <ul class="works-grid" id="works-grid">
+                    <!-- Portfolio items will be dynamically injected here by app.js -->
+                </ul>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Load data first, then the logic -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

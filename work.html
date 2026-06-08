@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Detail - GUPON MOTION DESIGN</title>
+    <meta name="description" content="Portfolio site based on GUPON motion design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="work-detail-page">
+    <div id="app">
+        <div class="container">
+            <header class="header">
+                <div class="sitename">
+                    <a href="index.html">GUPON MOTION DESIGN</a>
+                </div>
+                <nav>
+                    <ul class="nav">
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="index.html">Works</a></li>
+                    </ul>
+                </nav>
+            </header>
+            
+            <main>
+                <div id="work-detail" class="work-detail">
+                    <!-- Detail content will be dynamically injected here by app.js -->
+                    <div class="loading">Loading...</div>
+                </div>
+                
+                <div class="back-link">
+                    <a href="index.html">← Back to Works</a>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
