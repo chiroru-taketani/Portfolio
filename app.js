@@ -243,12 +243,27 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const isCategoryItem = item.category && item.details;
                                 const isUrlItem = item.label && item.url;
                                 
-                                if (!(isCategoryItem || isUrlItem) && inList) {
+                                if (!(isCategoryItem || isUrlItem || item.code) && inList) {
                                     html += `</ul>`;
                                     inList = false;
                                 }
                                 
-                                if (isCategoryItem || isUrlItem) {
+                                if (item.code) {
+                                    const lang = item.language || 'clike';
+                                    const filenameHtml = item.filename ? `<span class="code-filename">${item.filename}</span>` : '';
+                                    html += `
+                                        <details class="code-toggle-wrapper">
+                                            <summary class="code-toggle-summary"><span>ソースコードを表示</span></summary>
+                                            <div class="code-block-wrapper">
+                                                <div class="code-block-header">
+                                                    ${filenameHtml}
+                                                    <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                                                </div>
+                                                <pre class="language-${lang}"><code class="language-${lang}">${escapeHtml(item.code)}</code></pre>
+                                            </div>
+                                        </details>
+                                    `;
+                                } else if (isCategoryItem || isUrlItem) {
                                     if (!inList) {
                                         html += `<ul>`;
                                         inList = true;
@@ -280,6 +295,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
 
                         html += `</section>`;
+                        renderedSomething = true;
+                    } else if (sec.code) {
+                        const lang = sec.language || 'clike';
+                        const filenameHtml = sec.filename ? `<span class="code-filename">${sec.filename}</span>` : '';
+                        html += `<section class="work-section">
+                            <h2>${title}</h2>
+                            <details class="code-toggle-wrapper">
+                                <summary class="code-toggle-summary"><span>ソースコードを表示</span></summary>
+                                <div class="code-block-wrapper">
+                                    <div class="code-block-header">
+                                        ${filenameHtml}
+                                        <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre class="language-${lang}"><code class="language-${lang}">${escapeHtml(sec.code)}</code></pre>
+                                </div>
+                            </details>
+                        </section>`;
                         renderedSomething = true;
                     } else if (sec.contentHtml) {
                         html += `<section class="work-section">
@@ -324,5 +356,79 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.MathJax && window.MathJax.typesetPromise) {
             window.MathJax.typesetPromise([workDetail]).catch((err) => console.log('MathJax error:', err));
         }
+
+        // Highlight code blocks dynamically
+        if (window.Prism) {
+            window.Prism.highlightAllUnder(workDetail);
+        }
     }
 });
+
+// --- Code Block Helper Functions ---
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
+window.copyCode = function(button) {
+    const pre = button.parentElement.nextElementSibling;
+    const codeElement = pre.querySelector('code');
+    if (!codeElement) return;
+    const code = codeElement.innerText;
+    
+    function showSuccess() {
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.classList.remove('copied');
+        }, 2000);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(showSuccess).catch(err => {
+            console.error('Failed to copy: ', err);
+            fallbackCopy(code, showSuccess);
+        });
+    } else {
+        fallbackCopy(code, showSuccess);
+    }
+};
+
+function fallbackCopy(text, callback) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "2em";
+    textArea.style.height = "2em";
+    textArea.style.padding = "0";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.boxShadow = "none";
+    textArea.style.background = "transparent";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            callback();
+        } else {
+            console.error('Fallback: Copying text command was unsuccessful');
+        }
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    document.body.removeChild(textArea);
+}
