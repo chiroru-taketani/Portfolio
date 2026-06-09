@@ -126,10 +126,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (sec.type === 'overview') {
                     const desc = sec.description || sec.text || '';
+                    const isVideo = sec.demoMedia ? sec.demoMedia.match(/\.(mp4|webm|mov|ogg)$/i) : false;
                     html += `<section class="work-section">
                         <h2>${title}</h2>
                         ${sec.catchphrase ? `<h3>${sec.catchphrase}</h3>` : ''}
-                        ${sec.demoMedia ? `<div class="demo-media"><img src="${sec.demoMedia}" alt="Demo" loading="lazy" /></div>` : ''}
+                        ${sec.demoMedia ? (isVideo ? 
+                            `<div class="demo-media"><video src="${sec.demoMedia}" controls style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);" preload="metadata"></video></div>` : 
+                            `<div class="demo-media"><img src="${sec.demoMedia}" alt="Demo" loading="lazy" /></div>`
+                        ) : ''}
                         ${desc ? `<p>${desc}</p>` : ''}
                     </section>`;
                     renderedSomething = true;

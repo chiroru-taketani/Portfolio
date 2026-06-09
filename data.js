@@ -8,10 +8,11 @@ const sectionTitles = {
     architecture: "システムについて",
     challenges: "技術的な課題と解決策",
     achievements: "実績",
-    role: "担当箇所と開発体制",
+    about: "作品について",
     links: "成果物へのリンク",
     SystemArchitecture: "システム構成",
-    gallery: "ギャラリー"
+    gallery: "ギャラリー",
+    gamedesign:"ゲームデザインについて"
 };
 
 const portfolioData = [
@@ -34,13 +35,14 @@ const portfolioData = [
             overview: {
                 catchphrase: "影を操作するインタラクション",
                 description: "卒業論文として、影を直接操作するインタラクティブシステムを制作。<br>仮想的なCGの影ではなく、実世界で物体から床に落ちている「現実の影」そのものに触れ、引き伸ばしたり移動させたりできる直感的な操作で影を直接掴んで動かす体験を創出。",
+                demoMedia: "assets/works/01/Shadow.mp4"
             },
         
             techStack: [
                 { category: "使用言語・ライブラリ", details: "C/C++、OpenCV、OpenGL" },
                 { category: "ハードウェア・センサー", details: "LiDAR、Kinect v2、LEDパネル" },
                 { category: "制作期間・役割", details: "1年・個人開発" },
-                "assets/works/01/Shadow.mp4"
+                
             ],
 
             achievements: [
@@ -123,15 +125,18 @@ const portfolioData = [
     },
     {
         id: "project-3",
-        title: "岡崎アートナイトフェスティバル<br>プロジェクションマッピング",
+        title: "岡崎アートナイトフェスティバル大手門プロジェクションマッピング",
+        shortDescription: "プロジェクションマッピング作品",
         date: "2022.11",
         client: "岡崎アートナイトフェスティバル",
         thumbnail: "assets/works/03/01_key.png",
         images: ["assets/works/03/01_key.png"],
         content: {
+
             overview: {
                 catchphrase: "歴史的建造物に対するプロジェクションマッピング",
                 description: "岡崎アートナイトフェスティバルの一環として、岡崎城の大手門を対象としたプロジェクションマッピング映像を制作しました。岡崎城の歴史をテーマに、歴史的建造物の物理的な形状とデジタル映像を融合させた映像作品を制作しました。",
+                demoMedia: "assets/works/03/Movie.mov"
             },
             techStack: [
                 { category: "使用ツール", details: "AfterEffects" },
@@ -142,51 +147,74 @@ const portfolioData = [
                 "**展示の反響**",
                 "約200人の観客に楽しんでいただきました。"
             ],
-            role: [
-                "**担当した役割**",
-                "チーム制作（10名）映像制作を担当"
+            about: [
+                "1873年の廃条例によって廃城になった岡崎城の復興を木の成長とに合わせて廃城から復興へ至る力強い生命力を、時間の経過と共に表現。",
+                { images: [
+                     "assets/works/03/about_01.png", 
+                     "assets/works/03/about_02.png"
+                ]},
+                "日本の伝統的な紋様を随所に散りばめ、岡崎の歴史的背景と繁栄を視覚的に演出",
+                {image:"assets/works/03/about_03.png", },
+                "伝統と対比させる形でサイバー調のエフェクトを融合させ、未来への進化と躍動感を表現",
+                {image:"assets/works/03/about_04.png", }
             ],
-            links: [
-                { label: "映像（一部）", url: "https://youtu.be/EEQYhtfKv90" }
-            ]
         },
         
         link: "work.html?id=project-3"
     },
     {
-        id: "project-4",
+         id: "project-4",
         title: "キューブでポン！",
-        shortDescription: "ルービックキューブをインターフェースとした体験型ゲーム作品",
-        date: "2022.11",
-        client: "Bic Festival（韓国釜山） 2022、東京ゲームショウ2022出展",
+        shortDescription: "ルービックキューブをインターフェースにしたゲーム",
+        date: "2023.10",
+        client: "ゲーム作品",
+        thumbnail: "assets/works/04/key.jpeg",
+
         content: {
+            gallery: [
+                "assets/works/04/gallery_01.jpeg",
+                "assets/works/04/gallery_02.jpg",
+                "assets/works/04/gallery_03.jpeg",
+                "assets/works/04/gallery_04.jpg"
+            ],
+
             overview: {
-                catchphrase: "",
-                // demoMedia: "assets/thumb2.png",
-                description: "",
+                catchphrase: "ルービックキューブをインターフェースに",
+                description: "「キューブでポン」は、物理的なルービックキューブをインターフェースとして活用し、ルービックキューブができる人もそうでない人も直感的に楽しめるよう設計された、新しい遊び方を提案するパズルゲーム。",
+                demoMedia: "assets/works/04/movie.mp4"
             },
-            techStack: {
-                title: "使用ツール・期間",
-                items: [
-                    { category: "使用ツール", details: "AfterEffects" },
-                    { category: "ハードウェア", details: "プロジェクター" },
-                    { category: "制作期間", details: "1週間" },
-                ]
-            },
-            achievements: {
-                title: "展示の反響",
-                text: "約200人の観客に楽しんでいただきました。"
-            },
-            role: {
-                title: "担当した役割",
-                text: "チーム制作（10名）映像制作を担当"
-            },
+        
+            techStack: [
+                { category: "使用言語・ライブラリ", details: "C++、OpenCV、Unity（C#）" },
+                { category: "ハードウェア・センサー", details: "Webカメラ" },
+                { category: "制作期間・役割", details: "６ヶ月・チーム開発（６人）・ゲームデザイン、センサリングを担当" },
+                
+            ],
+
+            achievements: [
+                "東京ゲームショウ 2023 出展",
+                "ゲームマーケット東京 2023 出展",
+                "ビットサミット2023 出展",
+                "BIC Festival（韓国） 2024 出展"
+            ],
+
+            gamedesign: [
+                "本ゲームは、本来は特定のスキルを持つ人に限定されがちなルービックキューブを、誰もが平等に楽しめる直感的なインターフェースへと昇華させることを目指したパズルゲーム。",
+                "ルービックキューブは世界共通の普遍的なパズル玩具であるという点に着目し、韓国を含むグローバルな環境でも直感的に理解できる遊びを模索。従来の「同じ色の面を揃える」という難易度の高い遊び方ではなく、「物理的なルービックキューブの面を、ゲーム画面上の指定と揃える」という新しいルールを導入することで、キューブの習熟度に関わらず、すべてのプレイヤーが同じ土俵で楽しめるゲームデザインを実現している。"
+            ],
+
+            SystemArchitecture:[
+                "このゲームは物理的なルービックキューブの面の色情報の取得が必要である。指定の箱の中にルービックキューブを設置して上面をWebカメラで撮影。撮影した画像をもとにOpenCVでルービックキューブの色を取得。",
+                { images: [
+                    "assets/works/04/System_01.png",
+                    "assets/works/04/System_02.png"
+                ] },
+            ],
+
             links: [
-                { label: "映像（一部）", url: "https://youtu.be/EEQYhtfKv90" }
+                { label: "GitHub", url: "https://youtu.be/EEQYhtfKv90" }
             ]
         },
-        thumbnail: "assets/thumb4.png",
-        images: ["assets/thumb4.png", "assets/thumb1.png"],
         link: "work.html?id=project-4"
     },
     {
