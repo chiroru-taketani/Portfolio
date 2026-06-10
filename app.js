@@ -127,13 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (sec.type === 'overview') {
                     const desc = sec.description || sec.text || '';
                     const isVideo = sec.demoMedia ? sec.demoMedia.match(/\.(mp4|webm|mov|ogg)$/i) : false;
+                    const ytMatch = sec.demoMedia ? sec.demoMedia.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/) : null;
                     html += `<section class="work-section">
                         <h2>${title}</h2>
                         ${sec.catchphrase ? `<h3>${sec.catchphrase}</h3>` : ''}
-                        ${sec.demoMedia ? (isVideo ? 
+                        ${sec.demoMedia ? (ytMatch && ytMatch[1] ?
+                            `<div class="video-embed"><div class="iframe-container"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>` :
+                            (isVideo ? 
                             `<div class="demo-media"><video src="${sec.demoMedia}" controls style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);" preload="metadata"></video></div>` : 
                             `<div class="demo-media"><img src="${sec.demoMedia}" alt="Demo" loading="lazy" /></div>`
-                        ) : ''}
+                        )) : ''}
                         ${desc ? `<p>${desc}</p>` : ''}
                     </section>`;
                     renderedSomething = true;
