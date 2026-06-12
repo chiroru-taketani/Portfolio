@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <p class="work-title">${item.title}</p>
                     ${item.shortDescription ? `<p class="work-short-desc">${item.shortDescription}</p>` : ''}
+                    ${item.tags ? `
+                        <div class="work-tags">
+                            ${item.tags.map(tag => `<span class="work-tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
                 </a>
             </li>
         `).join('');
@@ -347,6 +352,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="detail-date">${project.date || ''}</span>
                         <span class="detail-client">${project.client ? '| ' + project.client : ''}</span>
                     </div>
+                    ${project.tags ? `
+                        <div class="detail-tags">
+                            ${project.tags.map(tag => `<span class="detail-tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
                 </div>
             </div>
             
