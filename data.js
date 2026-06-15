@@ -102,6 +102,13 @@ const portfolioData = [
         client: "大人数参加型インタラクティブ映像",
         thumbnail: "assets/works/02/key.png",
         content: {
+            gallery: [
+                "assets/works/02/key.png",
+                "assets/works/02/gallery_01.png",
+                "assets/works/02/gallery_02.png",
+                "assets/works/02/gallery_03.png",
+            ],
+
             overview: {
                 catchphrase: "会場全体を巻き込む、参加型インタラクティブ映像",
                 description: "「愛知県陽明学区二十歳を祝う記念式典（成人式）」のオープニングアクトとして、会場の参加者がリアルタイムで映像に干渉できるインタラクティブシステムを企画・開発。単なる映像の視聴ではなく、参加者自身がアクションを起こすことで完成する「体験型コンテンツ」を提供し、式典の一体感と没入感を創出。",
@@ -707,6 +714,8 @@ void mouseCV(int event, int x, int y, int flg, void *param)//マウスが押さ�
         },
         link: "work.html?id=project-9"
     },
+
+    
 
     
 
