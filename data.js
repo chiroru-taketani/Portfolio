@@ -122,7 +122,7 @@ const portfolioData = [
                 { category: "制作期間", details: "1ヶ月、個人制作" }
             ],
             architecture: [
-                "会場に設置したマイクに入力された音声をリアルタイムに取得し、音量に応じて映像に花火を打ち上げるシステムを開発。プロトタイプ完成の速さやGLSL環境からTouchDesignerを使用して開発"
+                "会場に設置したマイクに入力された音声をリアルタイムに取得し、音量に応じて映像に花火を打ち上げるシステムを開発。プロトタイプ完成の速さやGLSL環境からTouchDesignerを使用して開発",
                 { images: [
                     "assets/works/02/shystem.png",
                 ] },
