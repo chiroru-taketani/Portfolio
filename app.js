@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update document title
-        document.title = `${project.title} - GUPON MOTION DESIGN`;
+        document.title = `${project.title} - Taketani Shinjiro`;
 
         const images = project.images ? [...project.images] : (project.thumbnail ? [project.thumbnail] : []);
         // 最初の画像をキービジュアルとして取得
