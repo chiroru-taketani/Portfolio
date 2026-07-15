@@ -10,22 +10,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Index Page Logic ---
     if (worksGrid) {
-        const htmlContent = portfolioData.map(item => `
-            <li class="work-item">
+        const htmlContent = portfolioData.map(item => {
+            const featuredClass = item.id === 'project-1' ? ' work-item-featured' : '';
+            return `
+            <li class="work-item${featuredClass}">
                 <a href="${item.link}">
                     <div class="thumbnail-wrapper">
                         <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" />
                     </div>
-                    <p class="work-title">${item.title}</p>
-                    ${item.shortDescription ? `<p class="work-short-desc">${item.shortDescription}</p>` : ''}
-                    ${item.tags ? `
-                        <div class="work-tags">
-                            ${item.tags.map(tag => `<span class="work-tag">${tag}</span>`).join('')}
-                        </div>
-                    ` : ''}
+                    <div class="work-info">
+                        <p class="work-title">${item.title}</p>
+                        ${item.shortDescription ? `<p class="work-short-desc">${item.shortDescription}</p>` : ''}
+                        ${item.tags ? `
+                            <div class="work-tags">
+                                ${item.tags.map(tag => `<span class="work-tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
                 </a>
             </li>
-        `).join('');
+        `}).join('');
 
         worksGrid.innerHTML = htmlContent;
     }
