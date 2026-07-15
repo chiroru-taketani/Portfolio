@@ -1,17 +1,9 @@
 /* styles.css */
 :root {
-    --bg-color: #ffffff;
-    --text-color: #1a1a1a;
-    --hover-overlay: rgba(0, 0, 0, 0.05);
+    --bg-color: #0c0c0c;
+    --text-color: #f0f0f0;
+    --hover-overlay: rgba(255, 255, 255, 0.05);
     --transition-speed: 0.4s;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #0c0c0c;
-        --text-color: #f0f0f0;
-        --hover-overlay: rgba(255, 255, 255, 0.05);
-    }
 }
 
 * {
