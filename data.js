@@ -40,7 +40,7 @@ const portfolioData = [
             overview: {
                 catchphrase: "現実の影を直接掴んで動かす、新たなインタラクション体験",
                 description: "卒業研究として、実世界における「現実の影」を直接操作するインタラクティブシステムを開発した。<br>仮想的なCGの影ではなく、物体から床に落ちた実際の影に直接触れ、引き伸ばしたり移動させたりする直感的な操作を実現。「影を掴む」という非日常的な体験を創出する。",
-                demoMedia: "assets/works/01/Shadow.mp4"
+                demoMedia: "https://youtu.be/KPO5YLKBtdE"
             },
         
             techStack: [
@@ -126,7 +126,7 @@ const portfolioData = [
             architecture: [
                 "会場に設置したマイクから入力される音声をリアルタイムに取得し、その音量に応じて映像内に花火を打ち上げるシステムを開発した。プロトタイプ構築の迅速さや、GLSLの実装が容易であるという理由から、開発環境にはTouchDesignerを採用している。",
                 { images: [
-                    "assets/works/02/shystem.png",
+                    "assets/works/02/system.png",
                 ] },
             ],
             
@@ -150,7 +150,7 @@ const portfolioData = [
             overview: {
                 catchphrase: "歴史的建造物に対するプロジェクションマッピング",
                 description: "岡崎アートナイトフェスティバルの一環として、岡崎城の大手門を対象としたプロジェクションマッピング映像を制作した。岡崎城の歴史をテーマに、歴史的建造物の物理的な形状とデジタル映像を融合させた映像作品である。",
-                demoMedia: "assets/works/03/Movie.mov"
+                demoMedia: "assets/works/03/movie.mp4"
             },
             techStack: [
                 { category: "使用ツール", details: "AfterEffects" },
@@ -494,7 +494,7 @@ void mouseCV(int event, int x, int y, int flg, void *param)//マウスが押さ�
             overview: {
                 catchphrase: "「乾杯」という日常の楽しいアクションを遊びに昇華させた体感型リズムゲーム",
                 description: "「乾杯の音頭は破壊から」はビールジョッキをコントローラーに見立て、タイミングよくジョッキ同士をぶつける体感型ゲームである。本作の最大のこだわりは「見ている人も楽しめる」点にある。ゲームの動作を極限まで単純化することで、誰もが直感的に遊べるゲームデザインを実現した。",
-                demoMedia: "assets/works/05/movie.MP4"
+                demoMedia: "assets/works/05/movie.mp4"
             },
         
             techStack: [
