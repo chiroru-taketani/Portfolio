@@ -1,15 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if portfolioData is available
-    if (typeof portfolioData === 'undefined') {
-        console.error('Error: portfolioData is not defined.');
-        return;
-    }
-
     const worksGrid = document.getElementById('works-grid');
     const workDetail = document.getElementById('work-detail');
     
     // --- Index Page Logic ---
-    if (worksGrid) {
+    if (worksGrid && typeof portfolioData !== 'undefined') {
         const htmlContent = portfolioData.map(item => {
             const featuredClass = item.id === 'project-1' ? ' work-item-featured' : '';
             return `
@@ -35,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Detail Page Logic ---
-    if (workDetail) {
+    if (workDetail && typeof portfolioData !== 'undefined') {
         // Get the ID from the URL query parameter (e.g. ?id=project-1)
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('id');
@@ -64,6 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const headerStyle = keyVisualSrc ? `background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7)), url('${keyVisualSrc}');` : '';
         const headerClass = keyVisualSrc ? 'detail-header hero-header' : 'detail-header';
 
+        function parseInlineMarkdown(str) {
+            if (typeof str !== 'string') return '';
+            return str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        }
+
         // ... generateDetailContent function ...
         function generateDetailContent(project, remainingImages) {
             let html = '';
@@ -77,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (!project.content) {
-                html += `<div class="work-section"><p>${project.description || ''}</p></div>`;
+                html += `<div class="work-section"><p>${parseInlineMarkdown(project.description || '')}</p></div>`;
                 while (remainingImages.length > 0) {
                     html += renderImage();
                 }
@@ -122,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sec.items.forEach(customSec => {
                         html += `<section class="work-section">
                             <h2>${customSec.title}</h2>
-                            ${customSec.contentHtml || (customSec.text ? `<p>${customSec.text}</p>` : '')}
+                            ${customSec.contentHtml || (customSec.text ? `<p>${parseInlineMarkdown(customSec.text)}</p>` : '')}
                         </section>`;
                     });
                     return;
@@ -146,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             `<div class="demo-media"><video src="${sec.demoMedia}" controls style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);" preload="metadata"></video></div>` : 
                             `<div class="demo-media"><img src="${sec.demoMedia}" alt="Demo" loading="lazy" /></div>`
                         )) : ''}
-                        ${desc ? `<p>${desc}</p>` : ''}
+                        ${desc ? `<p>${parseInlineMarkdown(desc)}</p>` : ''}
                     </section>`;
                     renderedSomething = true;
 
@@ -212,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (sec.text) {
                         html += `<section class="work-section">
                             <h2>${title}</h2>
-                            <p>${sec.text}</p>
+                            <p>${parseInlineMarkdown(sec.text)}</p>
                         </section>`;
                         renderedSomething = true;
                     } else if (sec.items && Array.isArray(sec.items)) {
@@ -224,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (typeof item === 'string') {
                                 const isImage = item.match(/\.(png|jpg|jpeg|gif|webp|svg)$/i);
                                 const isVideo = item.match(/\.(mp4|webm|mov|ogg)$/i);
-                                const isHeading3 = item.startsWith('**') && item.endsWith('**');
+                                const isHeading3 = item.startsWith('**') && item.endsWith('**') && !item.slice(2, -2).includes('**');
                                 const isHeading4 = item.startsWith('###');
                                 const isListItem = item.startsWith('- ') || item.startsWith('・');
                                 
@@ -240,16 +239,15 @@ document.addEventListener('DOMContentLoaded', () => {
                                 } else if (isHeading3) {
                                     html += `<h3>${item.slice(2, -2)}</h3>`;
                                 } else if (isHeading4) {
-                                    html += `<h4>${item.replace(/^###\s*/, '')}</h4>`;
+                                    html += `<h4>${parseInlineMarkdown(item.replace(/^###\s*/, ''))}</h4>`;
                                 } else if (isListItem) {
                                     if (!inList) {
                                         html += `<ul>`;
                                         inList = true;
                                     }
-                                    html += `<li>${item.replace(/^[-・]\s*/, '')}</li>`;
+                                    html += `<li>${parseInlineMarkdown(item.replace(/^[-・]\s*/, ''))}</li>`;
                                 } else {
-                                    // Make sure text that was meant to be heading but has typo (like ending in **) can still just render as text
-                                    html += `<p>${item}</p>`;
+                                    html += `<p>${parseInlineMarkdown(item)}</p>`;
                                 }
                             } else {
                                 const isCategoryItem = item.category && item.details;
@@ -281,12 +279,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                         inList = true;
                                     }
                                     if (isCategoryItem) {
-                                        html += `<li><strong>${item.category}:</strong> ${item.details}</li>`;
+                                        html += `<li><strong>${item.category}:</strong> ${parseInlineMarkdown(item.details)}</li>`;
                                     } else {
                                         html += `<li><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.label}</a></li>`;
                                     }
                                 } else if (item.subtitle) {
-                                    html += `<h3>${item.subtitle}</h3>`;
+                                    html += `<h3>${parseInlineMarkdown(item.subtitle)}</h3>`;
                                 } else if (item.image) {
                                     const customStyle = item.width ? `width: ${item.width}; margin: 3.5rem auto;` : '';
                                     html += `<div class="detail-image-inline" style="${customStyle}"><img src="${item.image}" alt="image" loading="lazy" /></div>`;
@@ -297,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     });
                                     html += `</div>`;
                                 } else if (item.text) {
-                                    html += `<p>${item.text}</p>`;
+                                    html += `<p>${parseInlineMarkdown(item.text)}</p>`;
                                 }
                             }
                         });
@@ -379,7 +377,122 @@ document.addEventListener('DOMContentLoaded', () => {
             window.Prism.highlightAllUnder(workDetail);
         }
     }
+
+    initShadowTracking();
 });
+
+// --- Dynamic Cursor-Following Shadow Control (Inspired by Shadow Tracking Research) ---
+function initShadowTracking() {
+    // Skip on touch-only devices without fine pointer
+    if (window.matchMedia && !window.matchMedia('(pointer: fine)').matches) {
+        return;
+    }
+
+    let targetX = window.innerWidth * 0.5;
+    let targetY = window.innerHeight * 0.35;
+    let currentX = targetX;
+    let currentY = targetY;
+
+    window.addEventListener('mousemove', (e) => {
+        targetX = e.clientX;
+        targetY = e.clientY;
+    }, { passive: true });
+
+    const root = document.documentElement;
+
+    function updateShadows() {
+        // Smooth interpolation simulating physical actuator / movable light source inertia
+        currentX += (targetX - currentX) * 0.14;
+        currentY += (targetY - currentY) * 0.14;
+
+        // Virtual light source (p_L) moves opposite to cursor (p_H) so shadows cast toward cursor
+        const lightPctX = 100 - (currentX / Math.max(window.innerWidth, 1)) * 100;
+        const lightPctY = 100 - (currentY / Math.max(window.innerHeight, 1)) * 100;
+        root.style.setProperty('--light-x', `${lightPctX.toFixed(1)}%`);
+        root.style.setProperty('--light-y', `${lightPctY.toFixed(1)}%`);
+
+        // 1. Media & Image Cards (Strong, long cast shadows pulled toward the cursor)
+        const cards = document.querySelectorAll(
+            '.profile-image, .thumbnail-wrapper, .detail-image-inline, .gallery-item, .demo-media, .iframe-container'
+        );
+        cards.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.bottom < -120 || rect.top > window.innerHeight + 120) return;
+
+            const cx = rect.left + rect.width * 0.5;
+            const cy = rect.top + rect.height * 0.5;
+            const dx = currentX - cx;
+            const dy = currentY - cy;
+            const dist = Math.hypot(dx, dy) || 1;
+
+            const ux = dx / dist;
+            const uy = dy / dist;
+
+            // Shadow stretches longer and darker toward the cursor (p_H)
+            const reach = Math.min(dist * 0.24, 68);
+            const sx = ux * reach;
+            const sy = uy * reach;
+
+            el.style.boxShadow = [
+                `${(sx * 0.22).toFixed(1)}px ${(sy * 0.22).toFixed(1)}px 10px rgba(10, 10, 10, 0.34)`,
+                `${(sx * 0.65).toFixed(1)}px ${(sy * 0.65).toFixed(1)}px 28px -2px rgba(10, 10, 10, 0.42)`,
+                `${(sx * 1.30).toFixed(1)}px ${(sy * 1.30).toFixed(1)}px 56px -2px rgba(10, 10, 10, 0.30)`
+            ].join(', ');
+        });
+
+        // 2. Interactive Pill Buttons & Skill Badges (Darker, longer tactile shadows pulled toward cursor)
+        const pills = document.querySelectorAll(
+            '.profile-link-btn, .inline-work-link, .skill-list li, .back-link a, .award-badge'
+        );
+        pills.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.bottom < -50 || rect.top > window.innerHeight + 50) return;
+
+            const cx = rect.left + rect.width * 0.5;
+            const cy = rect.top + rect.height * 0.5;
+            const dx = currentX - cx;
+            const dy = currentY - cy;
+            const dist = Math.hypot(dx, dy) || 1;
+
+            const reach = Math.min(dist * 0.13, 24);
+            const sx = (dx / dist) * reach;
+            const sy = (dy / dist) * reach;
+
+            el.style.boxShadow = [
+                `${(sx * 0.4).toFixed(1)}px ${(sy * 0.4).toFixed(1)}px 6px rgba(10, 10, 10, 0.20)`,
+                `${sx.toFixed(1)}px ${sy.toFixed(1)}px 18px rgba(10, 10, 10, 0.26)`
+            ].join(', ');
+        });
+
+        // 3. Headings (Stronger typographic shadow reaching toward cursor)
+        const headings = document.querySelectorAll(
+            '.profile-name, .detail-header:not(.hero-header) .detail-title'
+        );
+        headings.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.bottom < -50 || rect.top > window.innerHeight + 50) return;
+
+            const cx = rect.left + rect.width * 0.5;
+            const cy = rect.top + rect.height * 0.5;
+            const dx = currentX - cx;
+            const dy = currentY - cy;
+            const dist = Math.hypot(dx, dy) || 1;
+
+            const reach = Math.min(dist * 0.09, 20);
+            const sx = (dx / dist) * reach;
+            const sy = (dy / dist) * reach;
+
+            el.style.textShadow = [
+                `${(sx * 0.45).toFixed(1)}px ${(sy * 0.45).toFixed(1)}px 6px rgba(10, 10, 10, 0.24)`,
+                `${sx.toFixed(1)}px ${sy.toFixed(1)}px 18px rgba(10, 10, 10, 0.28)`
+            ].join(', ');
+        });
+
+        requestAnimationFrame(updateShadows);
+    }
+
+    requestAnimationFrame(updateShadows);
+}
 
 // --- Code Block Helper Functions ---
 function escapeHtml(str) {
