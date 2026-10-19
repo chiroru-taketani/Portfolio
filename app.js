@@ -1,11 +1,60 @@
+// ============================================================================
+// 動的シャドウ＆3D立体表現 一括設定（ここで影の濃さ・長さ・文字の厚みを一括調整できます）
+// ============================================================================
+const SHADOW_CONFIG = {
+    // --- 全体倍率（ここを変えるだけで全要素の影・立体感が一括で変わります） ---
+    opacityScale: 0.55, // 影の濃さ倍率（例: 1.0 でくっきり濃く、0.5 で控えめ）
+    lengthScale: 1.15,  // 影の伸びる長さ倍率（例: 1.5 で1.5倍長く伸びる）
+    blurScale: 1.05,    // 影のぼかし倍率（例: 0.7 でハードな影、1.4 で柔らかい影）
+    extrudeScale: 0.85, // 大見出し文字の3D厚み倍率（0 で厚みOFF、1.2 で強調）
+    colorRGB: '10, 10, 10', // 影のベース色 (R, G, B)
+    lerpSpeed: 0.2,     // カーソルへの追従速度（0.05 = ゆっくり慣性、0.3 = 素早く追従）
+
+    // --- 要素別の詳細設定 ---
+    card: {
+        // 画像・サムネイル・動画カード（リムライト＋多層シャドウ）
+        distFactor: 0.22,       // カーソル距離に対する伸び率
+        maxReach: 64,           // 最大の伸び量 (px)
+        layers: [
+            { offset: 0.22, blur: 10, spread: 0,  opacity: 0.34 }, // ① 根元の接地影
+            { offset: 0.65, blur: 28, spread: -2, opacity: 0.42 }, // ② 中間の本影
+            { offset: 1.30, blur: 54, spread: -2, opacity: 0.28 }  // ③ 先端の伸びる半影
+        ]
+    },
+    pill: {
+        // ボタン・スキルバッジ・受賞バッジ（カーソル接近時に浮き上がる距離減衰つき）
+        distFactor: 0.12,
+        maxReach: 18,
+        falloffRadius: 520,     // この距離(px)以内にあるボタン・バッジが強く影を落とす
+        layers: [
+            { offset: 0.35, blur: 5,  spread: 0, opacity: 0.22 },
+            { offset: 1.00, blur: 14, spread: 0, opacity: 0.28 }
+        ]
+    },
+    heading: {
+        // 大見出しテキストのみ（武谷 信次郎 / 作品メインタイトル / Featuredタイトル）
+        distFactor: 0.08,
+        maxReach: 16,
+        extrudeSteps: 2,        // 文字の輪郭を崩さないシャープな2層厚み
+        layers: [
+            { offset: 0.45, blur: 6,  opacity: 0.24 },
+            { offset: 1.00, blur: 16, opacity: 0.26 }
+        ]
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const worksGrid = document.getElementById('works-grid');
     const workDetail = document.getElementById('work-detail');
     
     // --- Index Page Logic ---
     if (worksGrid && typeof portfolioData !== 'undefined') {
+        const trophySvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`;
         const htmlContent = portfolioData.map(item => {
-            const featuredClass = item.id === 'project-1' ? ' work-item-featured' : '';
+            const isFeatured = item.id === 'project-1';
+            const featuredClass = isFeatured ? ' work-item-featured' : '';
+            const descText = isFeatured ? (item.featuredSummary || item.shortDescription) : item.shortDescription;
+
             return `
             <li class="work-item${featuredClass}">
                 <a href="${item.link}">
@@ -13,11 +62,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" />
                     </div>
                     <div class="work-info">
+                        ${isFeatured ? `<span class="featured-label">FEATURED PROJECT</span>` : ''}
                         <p class="work-title">${item.title}</p>
-                        ${item.shortDescription ? `<p class="work-short-desc">${item.shortDescription}</p>` : ''}
+                        ${descText ? `<p class="work-short-desc">${descText}</p>` : ''}
+                        ${isFeatured && item.featuredAwards ? `
+                            <div class="featured-awards">
+                                ${item.featuredAwards.map(aw => `<span class="award-badge">${trophySvg}<span>${aw}</span></span>`).join('')}
+                            </div>
+                        ` : ''}
                         ${item.tags ? `
                             <div class="work-tags">
                                 ${item.tags.map(tag => `<span class="work-tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        ${isFeatured ? `
+                            <div class="featured-cta-wrap">
+                                <span class="featured-cta-btn">
+                                    <span>View Project</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M5 12h14"/>
+                                        <path d="m12 5 7 7-7 7"/>
+                                    </svg>
+                                </span>
                             </div>
                         ` : ''}
                     </div>
@@ -53,14 +119,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const images = project.images ? [...project.images] : (project.thumbnail ? [project.thumbnail] : []);
         // 最初の画像をキービジュアルとして取得
         const keyVisualSrc = images.length > 0 ? images.shift() : null;
-        
-        // 背景画像用のスタイルを生成（暗いオーバーレイを重ねて文字を見やすくする）
-        const headerStyle = keyVisualSrc ? `background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7)), url('${keyVisualSrc}');` : '';
-        const headerClass = keyVisualSrc ? 'detail-header hero-header' : 'detail-header';
 
         function parseInlineMarkdown(str) {
             if (typeof str !== 'string') return '';
             return str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        function renderDemoMediaHtml(demoMedia) {
+            if (!demoMedia) return '';
+            const isVideo = demoMedia.match(/\.(mp4|webm|mov|ogg)$/i);
+            const ytMatch = demoMedia.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+            if (ytMatch && ytMatch[1]) {
+                return `<div class="video-embed"><div class="iframe-container"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>`;
+            }
+            if (isVideo) {
+                return `<div class="demo-media"><video src="${demoMedia}" controls style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);" preload="metadata"></video></div>`;
+            }
+            return `<div class="demo-media"><img src="${demoMedia}" alt="Demo" loading="lazy" /></div>`;
         }
 
         // ... generateDetailContent function ...
@@ -84,15 +159,59 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const c = project.content;
+            const globalTitles = typeof sectionTitles !== 'undefined' ? sectionTitles : {};
+            const hasTwoColSummary = !Array.isArray(c) && c.overview && (c.techStack || c.achievements);
 
-            const defTitles = typeof sectionTitles !== 'undefined' ? sectionTitles : {
-            };
+            if (hasTwoColSummary) {
+                const ov = typeof c.overview === 'string' ? { text: c.overview } : c.overview;
+                const desc = ov.description || ov.text || '';
+                const techItems = Array.isArray(c.techStack) ? c.techStack : [];
+                const achItems = Array.isArray(c.achievements) ? c.achievements : [];
+
+                html += `
+                <section class="work-section detail-summary-section">
+                    <div class="detail-summary-grid">
+                        <div class="summary-main">
+                            <h2>${ov.title || globalTitles.overview || 'プロジェクトの概要'}</h2>
+                            ${ov.catchphrase ? `<h3 class="summary-catchphrase">${ov.catchphrase}</h3>` : ''}
+                            ${desc ? `<p>${parseInlineMarkdown(desc)}</p>` : ''}
+                        </div>
+                        <aside class="summary-specs">
+                            ${techItems.length > 0 ? `
+                                <div class="spec-block">
+                                    <h2 class="spec-heading">${globalTitles.techStack || '使用技術・開発環境'}</h2>
+                                    <dl class="spec-list">
+                                        ${techItems.map(item => {
+                                            if (item && item.category && item.details) {
+                                                return `<div class="spec-item"><dt>${item.category}</dt><dd>${parseInlineMarkdown(item.details)}</dd></div>`;
+                                            }
+                                            return `<div class="spec-item"><dd>${parseInlineMarkdown(typeof item === 'string' ? item : '')}</dd></div>`;
+                                        }).join('')}
+                                    </dl>
+                                </div>
+                            ` : ''}
+                            ${achItems.length > 0 ? `
+                                <div class="spec-block">
+                                    <h2 class="spec-heading">${globalTitles.achievements || '実績'}</h2>
+                                    <ul class="spec-achievements">
+                                        ${achItems.map(ach => `<li>${parseInlineMarkdown(typeof ach === 'string' ? ach : '')}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </aside>
+                    </div>
+                    ${renderDemoMediaHtml(ov.demoMedia)}
+                </section>`;
+            }
 
             let sections = [];
             if (Array.isArray(c)) {
                 sections = c;
             } else {
                 sections = Object.keys(c).map(key => {
+                    if (hasTwoColSummary && (key === 'overview' || key === 'techStack' || key === 'achievements')) {
+                        return null;
+                    }
                     let data = c[key];
                     if (!data) return null;
 
@@ -128,28 +247,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Get title from data.js sectionTitles, or sec.title, or fallback to the key itself
-                const globalTitles = typeof sectionTitles !== 'undefined' ? sectionTitles : {};
                 let title = sec.title || globalTitles[sec.type] || sec.type;
                 let renderedSomething = false;
 
                 if (sec.type === 'overview') {
                     const desc = sec.description || sec.text || '';
-                    const isVideo = sec.demoMedia ? sec.demoMedia.match(/\.(mp4|webm|mov|ogg)$/i) : false;
-                    const ytMatch = sec.demoMedia ? sec.demoMedia.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/) : null;
                     html += `<section class="work-section">
                         <h2>${title}</h2>
                         ${sec.catchphrase ? `<h3>${sec.catchphrase}</h3>` : ''}
-                        ${sec.demoMedia ? (ytMatch && ytMatch[1] ?
-                            `<div class="video-embed"><div class="iframe-container"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>` :
-                            (isVideo ? 
-                            `<div class="demo-media"><video src="${sec.demoMedia}" controls style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);" preload="metadata"></video></div>` : 
-                            `<div class="demo-media"><img src="${sec.demoMedia}" alt="Demo" loading="lazy" /></div>`
-                        )) : ''}
+                        ${renderDemoMediaHtml(sec.demoMedia)}
                         ${desc ? `<p>${parseInlineMarkdown(desc)}</p>` : ''}
                     </section>`;
                     renderedSomething = true;
-
-
                 } else if (sec.type === 'links') {
                     const items = sec.items || [];
                     if (items.length > 0) {
@@ -347,13 +456,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Inject the detail content
         workDetail.innerHTML = `
-            <div class="${headerClass}" style="${headerStyle}">
+            <div class="detail-header">
                 <div class="header-content">
-                    <h1 class="detail-title">${project.title}</h1>
                     <div class="detail-meta">
                         <span class="detail-date">${project.date || ''}</span>
                         <span class="detail-client">${project.client ? '| ' + project.client : ''}</span>
                     </div>
+                    <h1 class="detail-title">${project.title}</h1>
                     ${project.tags ? `
                         <div class="detail-tags">
                             ${project.tags.map(tag => `<span class="detail-tag">${tag}</span>`).join('')}
@@ -361,6 +470,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     ` : ''}
                 </div>
             </div>
+            ${keyVisualSrc ? `
+                <div class="detail-key-visual thumbnail-wrapper">
+                    <img src="${keyVisualSrc}" alt="${project.title}" />
+                </div>
+            ` : ''}
             
             <div class="detail-content single-column">
                 ${generateDetailContent(project, images)}
@@ -400,10 +514,74 @@ function initShadowTracking() {
 
     const root = document.documentElement;
 
+    function clampAlpha(a) {
+        return Math.min(Math.max(a, 0), 1).toFixed(2);
+    }
+
+    function buildBoxShadow(sx, sy, ux, uy, layers, withRim = true, falloff = 1.0) {
+        const { colorRGB, opacityScale, blurScale, extrudeScale } = SHADOW_CONFIG;
+        const shadows = [];
+
+        if (withRim && extrudeScale > 0) {
+            // 光源側（影と逆方向）のエッジに当たるハイライト（リムライト）と暗部エッジ
+            const rimX = (-ux * 1.2 * extrudeScale).toFixed(1);
+            const rimY = (-uy * 1.2 * extrudeScale).toFixed(1);
+            const rimAlpha = (0.72 * falloff).toFixed(2);
+            const edgeAlpha = (0.18 * falloff).toFixed(2);
+            shadows.push(`inset ${rimX}px ${rimY}px 1px rgba(255, 255, 255, ${rimAlpha})`);
+            shadows.push(`inset ${(ux * 0.9 * extrudeScale).toFixed(1)}px ${(uy * 0.9 * extrudeScale).toFixed(1)}px 1px rgba(${colorRGB}, ${edgeAlpha})`);
+        }
+
+        layers.forEach((l) => {
+            const ox = (sx * l.offset * falloff).toFixed(1);
+            const oy = (sy * l.offset * falloff).toFixed(1);
+            const blur = (l.blur * blurScale * (0.5 + 0.5 * falloff)).toFixed(1);
+            const spread = l.spread ? ` ${l.spread}px` : '';
+            const alpha = clampAlpha(l.opacity * opacityScale * falloff);
+            shadows.push(`${ox}px ${oy}px ${blur}px${spread} rgba(${colorRGB}, ${alpha})`);
+        });
+
+        return shadows.join(', ');
+    }
+
+    function build3DTextShadow(sx, sy, ux, uy, config) {
+        const { colorRGB, opacityScale, blurScale, extrudeScale } = SHADOW_CONFIG;
+        const shadows = [];
+
+        if (extrudeScale > 0) {
+            // 1. 光源側のエッジハイライト（文字が光を受けて浮き立つ効果）
+            const hlX = (-ux * 0.7 * extrudeScale).toFixed(1);
+            const hlY = (-uy * 0.7 * extrudeScale).toFixed(1);
+            shadows.push(`${hlX}px ${hlY}px 0px rgba(255, 255, 255, 0.7)`);
+
+            // 2. 文字の物理的な厚み（輪郭を崩さないシャープなExtrusionステップ）
+            const steps = config.extrudeSteps || 2;
+            for (let i = 1; i <= steps; i++) {
+                const ex = (ux * i * 0.75 * extrudeScale).toFixed(1);
+                const ey = (uy * i * 0.75 * extrudeScale).toFixed(1);
+                const stepAlpha = clampAlpha((0.24 - i * 0.05) * opacityScale);
+                shadows.push(`${ex}px ${ey}px 0px rgba(${colorRGB}, ${stepAlpha})`);
+            }
+        }
+
+        // 3. 床面に落ちる浮遊キャストシャドウ
+        config.layers.forEach((l) => {
+            const ox = (sx * l.offset).toFixed(1);
+            const oy = (sy * l.offset).toFixed(1);
+            const blur = (l.blur * blurScale).toFixed(1);
+            const alpha = clampAlpha(l.opacity * opacityScale);
+            shadows.push(`${ox}px ${oy}px ${blur}px rgba(${colorRGB}, ${alpha})`);
+        });
+
+        return shadows.join(', ');
+    }
+
     function updateShadows() {
+        const { lerpSpeed, lengthScale, card, pill, heading } = SHADOW_CONFIG;
+
         // Smooth interpolation simulating physical actuator / movable light source inertia
-        currentX += (targetX - currentX) * 0.14;
-        currentY += (targetY - currentY) * 0.14;
+        currentX += (targetX - currentX) * lerpSpeed;
+        currentY += (targetY - currentY) * lerpSpeed;
 
         // Virtual light source (p_L) moves opposite to cursor (p_H) so shadows cast toward cursor
         const lightPctX = 100 - (currentX / Math.max(window.innerWidth, 1)) * 100;
@@ -411,7 +589,7 @@ function initShadowTracking() {
         root.style.setProperty('--light-x', `${lightPctX.toFixed(1)}%`);
         root.style.setProperty('--light-y', `${lightPctY.toFixed(1)}%`);
 
-        // 1. Media & Image Cards (Strong, long cast shadows pulled toward the cursor)
+        // 1. Media & Image Cards (Rim light + multi-layered cast shadow)
         const cards = document.querySelectorAll(
             '.profile-image, .thumbnail-wrapper, .detail-image-inline, .gallery-item, .demo-media, .iframe-container'
         );
@@ -424,26 +602,21 @@ function initShadowTracking() {
             const dx = currentX - cx;
             const dy = currentY - cy;
             const dist = Math.hypot(dx, dy) || 1;
-
             const ux = dx / dist;
             const uy = dy / dist;
 
-            // Shadow stretches longer and darker toward the cursor (p_H)
-            const reach = Math.min(dist * 0.24, 68);
+            const reach = Math.min(dist * card.distFactor, card.maxReach) * lengthScale;
             const sx = ux * reach;
             const sy = uy * reach;
 
-            el.style.boxShadow = [
-                `${(sx * 0.22).toFixed(1)}px ${(sy * 0.22).toFixed(1)}px 10px rgba(10, 10, 10, 0.34)`,
-                `${(sx * 0.65).toFixed(1)}px ${(sy * 0.65).toFixed(1)}px 28px -2px rgba(10, 10, 10, 0.42)`,
-                `${(sx * 1.30).toFixed(1)}px ${(sy * 1.30).toFixed(1)}px 56px -2px rgba(10, 10, 10, 0.30)`
-            ].join(', ');
+            el.style.boxShadow = buildBoxShadow(sx, sy, ux, uy, card.layers, true, 1.0);
         });
 
-        // 2. Interactive Pill Buttons & Skill Badges (Darker, longer tactile shadows pulled toward cursor)
+        // 2. Interactive Pill Buttons & Skill/Award Badges (Proximity-attenuated 3D Tokens)
         const pills = document.querySelectorAll(
-            '.profile-link-btn, .inline-work-link, .skill-list li, .back-link a, .award-badge'
+            '.profile-link-btn, .inline-work-link, .skill-list li, .back-link a, .award-badge, .featured-cta-btn'
         );
+        const radius = pill.falloffRadius || 520;
         pills.forEach((el) => {
             const rect = el.getBoundingClientRect();
             if (rect.bottom < -50 || rect.top > window.innerHeight + 50) return;
@@ -453,20 +626,21 @@ function initShadowTracking() {
             const dx = currentX - cx;
             const dy = currentY - cy;
             const dist = Math.hypot(dx, dy) || 1;
+            const ux = dx / dist;
+            const uy = dy / dist;
 
-            const reach = Math.min(dist * 0.13, 24);
-            const sx = (dx / dist) * reach;
-            const sy = (dy / dist) * reach;
+            // カーソルに近いボタン・バッジほど強く浮き上がり、遠いものは静かに接地する
+            const falloff = Math.max(0.2, 1 - Math.min(dist, radius) / radius * 0.8);
+            const reach = Math.min(dist * pill.distFactor, pill.maxReach) * lengthScale;
+            const sx = ux * reach;
+            const sy = uy * reach;
 
-            el.style.boxShadow = [
-                `${(sx * 0.4).toFixed(1)}px ${(sy * 0.4).toFixed(1)}px 6px rgba(10, 10, 10, 0.20)`,
-                `${sx.toFixed(1)}px ${sy.toFixed(1)}px 18px rgba(10, 10, 10, 0.26)`
-            ].join(', ');
+            el.style.boxShadow = buildBoxShadow(sx, sy, ux, uy, pill.layers, true, falloff);
         });
 
-        // 3. Headings (Stronger typographic shadow reaching toward cursor)
+        // 3. Display Headings ONLY (Crisp 3D Typography + Floating Shadow)
         const headings = document.querySelectorAll(
-            '.profile-name, .detail-header:not(.hero-header) .detail-title'
+            '.profile-name, .detail-title, .work-item-featured .work-title'
         );
         headings.forEach((el) => {
             const rect = el.getBoundingClientRect();
@@ -477,15 +651,14 @@ function initShadowTracking() {
             const dx = currentX - cx;
             const dy = currentY - cy;
             const dist = Math.hypot(dx, dy) || 1;
+            const ux = dx / dist;
+            const uy = dy / dist;
 
-            const reach = Math.min(dist * 0.09, 20);
-            const sx = (dx / dist) * reach;
-            const sy = (dy / dist) * reach;
+            const reach = Math.min(dist * heading.distFactor, heading.maxReach) * lengthScale;
+            const sx = ux * reach;
+            const sy = uy * reach;
 
-            el.style.textShadow = [
-                `${(sx * 0.45).toFixed(1)}px ${(sy * 0.45).toFixed(1)}px 6px rgba(10, 10, 10, 0.24)`,
-                `${sx.toFixed(1)}px ${sy.toFixed(1)}px 18px rgba(10, 10, 10, 0.28)`
-            ].join(', ');
+            el.style.textShadow = build3DTextShadow(sx, sy, ux, uy, heading);
         });
 
         requestAnimationFrame(updateShadows);

@@ -24,7 +24,12 @@ const portfolioData = [
         id: "project-1",
         title: "ユーザの手の動きに追従する動的な影の制御手法に関する研究",
         shortDescription: "影を操作するインタラクション",
-        tags: ["研究","インタラクション","個人制作"],
+        featuredSummary: "2次元LiDARと大型LEDパネル・OpenGLリアルタイムシミュレーションを連携させ、実空間に落ちた「現実の影」に直接触れて掴み・動かすインタラクティブシステム。",
+        featuredAwards: [
+            "WISS 2025 チームラボ賞・対話発表賞",
+            "DICOMO 2026 野口優秀賞・DCC研究会優秀賞"
+        ],
+        tags: ["研究","インタラクション","C/C++","OpenGL","個人制作"],
         date: "2025.04",
         client: "卒業研究",
         thumbnail: "assets/works/01/01.png",
@@ -212,7 +217,8 @@ const portfolioData = [
                 "東京ゲームショウ 2023 出展",
                 "ゲームマーケット東京 2023 出展",
                 "BitSummit 2023 出展",
-                "BIC Festival（韓国） 2024 出展"
+                "BIC Festival（韓国） 2024 出展",
+                "エンタテインメントコンピューティング2026 (EC2026) 出展"
             ],
 
             gamedesign: [
@@ -468,8 +474,12 @@ void mouseCV(int event, int x, int y, int flg, void *param)//マウスが押さ�
                     filename: "ImageProcessing.cpp"
                 }
             ],
-            
-
+            links: [
+                {
+                    label: "エンタテインメントコンピューティング2026 (EC2026) 公式サイト",
+                    url: "https://ec2026.entcomp.org/"
+                }
+            ]
         },
         link: "work.html?id=project-4"
     },
@@ -481,7 +491,7 @@ void mouseCV(int event, int x, int y, int flg, void *param)//マウスが押さ�
         shortDescription: "ビールジョッキをインターフェースにして乾杯をする体験型ゲーム作品",
         tags: ["ゲーム", "インタラクション", "デバイス制作","チーム制作"],
         date: "2026.11",
-        client: "BitSummit2026",
+        client: "BitSummit2026 / EC2026",
         thumbnail: "assets/works/05/key.png",
         content: {
             gallery: [
@@ -506,6 +516,7 @@ void mouseCV(int event, int x, int y, int flg, void *param)//マウスが押さ�
 
             achievements: [
                 "BitSummit 2026 出展",
+                "エンタテインメントコンピューティング2026 (EC2026) 出展"
             ],
 
             gamedesign: [
@@ -522,11 +533,13 @@ void mouseCV(int event, int x, int y, int flg, void *param)//マウスが押さ�
                 { images:["assets/works/05/System_02.png",
                      "assets/works/05/System_03.png"
                 ] }
-            
-                
             ],
-            
-
+            links: [
+                {
+                    label: "エンタテインメントコンピューティング2026 (EC2026) 公式サイト",
+                    url: "https://ec2026.entcomp.org/"
+                }
+            ]
         },
         
         link: "work.html?id=project-5"
